@@ -7,11 +7,33 @@ import (
 )
 
 func computeDh(aliceGroup, bobGroup int) ([]byte, []byte) {
-	alice := New(aliceGroup)
-	bob := New(bobGroup)
+	alice := NewKeyPair(aliceGroup)
+	bob := NewKeyPair(bobGroup)
 	aliceSecret := alice.ComputeSecret(bob.PublicKey)
 	bobSecret := bob.ComputeSecret(alice.PublicKey)
 	return aliceSecret, bobSecret
+}
+
+func TestNew(t *testing.T) {
+	alice := NewKeyPair()
+	bob := NewKeyPair()
+
+	aliceSecret := alice.ComputeSecret(bob.PublicKey)
+	bobSecret := bob.ComputeSecret(alice.PublicKey)
+
+	if !reflect.DeepEqual(bobSecret, aliceSecret) {
+		t.Errorf("Secrets do not match")
+	}
+
+	alice = New(alice.PublicKey, alice.PrivateKey)
+	bob = New(bob.PublicKey, bob.PrivateKey)
+
+	aliceSecret = alice.ComputeSecret(bob.PublicKey)
+	bobSecret = bob.ComputeSecret(alice.PublicKey)
+
+	if !reflect.DeepEqual(bobSecret, aliceSecret) {
+		t.Errorf("Secrets do not match")
+	}
 }
 
 func TestSameDefaultGroupDh(t *testing.T) {
@@ -36,9 +58,9 @@ func TestDifferentGroupDh(t *testing.T) {
 }
 
 func TestSubsequentDh(t *testing.T) {
-	alice := New()
-	bob := New()
-	eve := New()
+	alice := NewKeyPair()
+	bob := NewKeyPair()
+	eve := NewKeyPair()
 
 	if !reflect.DeepEqual(alice.ComputeSecret(bob.PublicKey), bob.ComputeSecret(alice.PublicKey)) {
 		t.Errorf("Secrets do not match for alice-bob")
@@ -57,7 +79,7 @@ func TestDiffieHellman_ComputeSecret(t *testing.T) {
 	privateKey := big.NewInt(2)
 	publicKey := new(big.Int).Exp(g, privateKey, modp2048pInt)
 
-	dh := New() //default group with modp2048pInt
+	dh := NewKeyPair() //default group with modp2048pInt
 	secret1 := dh.ComputeSecret(publicKey)
 	secret2 := new(big.Int).Exp(dh.PublicKey, privateKey, modp2048pInt).Bytes()
 
@@ -89,8 +111,8 @@ func TestInvalidGroup(t *testing.T) {
 		}
 	}()
 
-	New(1)
-	New(9)
-	New(89)
-	New(1004)
+	NewKeyPair(1)
+	NewKeyPair(9)
+	NewKeyPair(89)
+	NewKeyPair(1004)
 }

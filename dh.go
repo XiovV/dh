@@ -72,7 +72,16 @@ func dhFromGroup(groupId int) DiffieHellman {
 	return dh
 }
 
-func New(group ...int) DiffieHellman {
+func New(public, private *big.Int) DiffieHellman {
+	dh := DiffieHellman{}
+	p, _ := getGroupParams(defaultGroup)
+	dh.PublicKey = public
+	dh.PrivateKey = private
+	dh.p = p
+	return dh
+}
+
+func NewKeyPair(group ...int) DiffieHellman {
 	if len(group) >= 1 {
 		return dhFromGroup(group[0])
 	}
