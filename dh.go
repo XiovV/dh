@@ -47,11 +47,11 @@ func getGroupParams(id int) (*big.Int, int) {
 }
 
 type DiffieHellman struct {
-	PublicKey, privateKey, p *big.Int
+	PublicKey, PrivateKey, p *big.Int
 }
 
 func (dh DiffieHellman) ComputeSecret(public *big.Int) []byte {
-	return new(big.Int).Exp(public, dh.privateKey, dh.p).Bytes()
+	return new(big.Int).Exp(public, dh.PrivateKey, dh.p).Bytes()
 }
 
 func generatePrivateKey(keyLen int) *big.Int {
@@ -66,8 +66,8 @@ func generatePrivateKey(keyLen int) *big.Int {
 func dhFromGroup(groupId int) DiffieHellman {
 	dh := DiffieHellman{}
 	p, keyLen := getGroupParams(groupId)
-	dh.privateKey = generatePrivateKey(keyLen)
-	dh.PublicKey = new(big.Int).Exp(g, dh.privateKey, p)
+	dh.PrivateKey = generatePrivateKey(keyLen)
+	dh.PublicKey = new(big.Int).Exp(g, dh.PrivateKey, p)
 	dh.p = p
 	return dh
 }
