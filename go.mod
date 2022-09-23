@@ -1,3 +1,3 @@
-module github.com/WolframAlph/dh
+module github.com/XiovV/dh
 
-go 1.17
+go 1.18
